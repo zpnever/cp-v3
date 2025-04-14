@@ -31,25 +31,21 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env*
-.env
-
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 
 # Build & dependencies
 .next/
 node_modules/
 
 # Environment variables
-.env
-.env.local
-.env.production
-.env.development
+# .env
+# .env.local
+# .env.production
+# .env.development
 
 # Prisma cache
 prisma/dev.db
