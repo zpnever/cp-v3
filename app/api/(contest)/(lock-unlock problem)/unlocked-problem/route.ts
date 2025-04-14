@@ -23,6 +23,8 @@ export const POST = async (req: Request) => {
 		parsed = parsed.filter((item) => item.userId !== userId);
 
 		await redis.set(key, JSON.stringify(parsed), "EX", 1800); // 30 menit
+
+		return NextResponse.json({ message: "Success" }, { status: 200 });
 	} catch (error) {
 		console.error("Redis Error:", error);
 		return NextResponse.json({ message: "Error" }, { status: 500 });
