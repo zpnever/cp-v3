@@ -36,12 +36,15 @@ const FormLogin = () => {
 	const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
 		setErrorMessage("");
 
-		const data = await login(values);
-
-		if (data?.error) {
-			setErrorMessage(data.error);
-			return;
-		}
+		startTransition(() => {
+			login(values).then((data) => {
+				if (data?.error) {
+					setErrorMessage(data.error);
+				} else {
+					router.push("/admin/batch");
+				}
+			});
+		});
 	};
 
 	return (

@@ -46,14 +46,14 @@ export async function DELETE(
 
 		return NextResponse.json(
 			{
-				message: "Batch deleted successfully",
+				message: "User deleted successfully",
 			},
 			{ status: 200 }
 		);
 	} catch (error) {
-		console.error("Error deleting batch:", error);
+		console.error("Error deleting user:", error);
 		return NextResponse.json(
-			{ message: "Failed to delete batch" },
+			{ message: "Failed to delete user" },
 			{ status: 500 }
 		);
 	}
