@@ -60,7 +60,7 @@ async function sendOTPEmail(email: string, otp: string) {
 		from: `competitiveprogramming06@gmail.com`,
 		to: email,
 		subject: "Kode OTP Verifikasi",
-		text: `Kode OTP Anda: ${otp}`,
+		html: `<p>Kode OTP Anda: ${otp}</p>`,
 	});
 }
 

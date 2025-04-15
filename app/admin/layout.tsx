@@ -6,6 +6,7 @@ const listNav = [
 	{ name: "Batches", href: "/admin/batch" },
 	{ name: "Users", href: "/admin/users" },
 	{ name: "Teams", href: "/admin/teams" },
+	{ name: "Submissions", href: "/admin/submissions" },
 ];
 
 export default async function RootLayout({

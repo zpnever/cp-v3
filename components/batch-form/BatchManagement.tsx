@@ -28,7 +28,7 @@ const BatchManagement = () => {
 
 	useEffect(() => {
 		fetchBatches();
-	}, []);
+	}, [stepBatchEdit, isAddBatchModalOpen]);
 
 	const fetchBatches = () => {
 		fetch(`/api/batch`)

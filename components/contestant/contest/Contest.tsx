@@ -3,7 +3,6 @@
 import { Batch, Submission } from "@/lib/types";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ContestProblem from "./ContestProblem";
 import { useRouter } from "next/navigation";
@@ -57,7 +56,6 @@ const Contest = ({ userId, teamId, contestId }: IProps) => {
 
 			if (!res.ok) {
 				toast.error("Something Error");
-				return;
 			}
 
 			const locked: ILockedProblem[] = json.lockedProblem;
@@ -76,6 +74,7 @@ const Contest = ({ userId, teamId, contestId }: IProps) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [teamId, contestId, userId]);
 
+	// locked check
 	useEffect(() => {
 		if (!stepProblem) {
 			const interval = setInterval(() => {
@@ -178,6 +177,7 @@ const Contest = ({ userId, teamId, contestId }: IProps) => {
 						problemId={problemId}
 						userId={userId}
 						teamId={teamId}
+						stepProblem={stepProblem}
 						onBack={() => setStepProblem(false)}
 					/>
 				</div>

@@ -21,15 +21,11 @@ const CardBatchContest = ({ teamId }: { teamId: string }) => {
 				const res = await fetch(`/api/team-batch/${teamId}`);
 				const json = await res.json();
 
-				if (!res.ok) {
-					toast.error(json.message);
-					return;
-				}
-
 				setBatches(json.data.batches);
 				setSubmission(json.data.submissions);
+				setIsLoading(false);
 			} catch (error) {
-				toast.error("Failed to fetch batch data");
+				console.log(error)
 			}
 			setIsLoading(false);
 		};

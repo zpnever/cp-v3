@@ -37,6 +37,7 @@ interface IProps {
 	onBack: () => void;
 	startedAt: Date | string;
 	duration: number;
+	stepProblem: boolean;
 	onFinish: () => void;
 }
 
@@ -49,6 +50,7 @@ const ContestProblem = ({
 	duration,
 	onBack,
 	onFinish,
+	stepProblem,
 }: IProps) => {
 	const [isLoading, setIsLoading] = useState(true);
 	const addLog = useSubmissionStore((s) => s.addLog);
@@ -168,6 +170,20 @@ const ContestProblem = ({
 			languageId: getLanguage.functionTemplate,
 		}));
 	};
+
+	// Nembak api locked
+	useEffect(() => {
+		if (stepProblem) {
+			const interval = setInterval(() => {
+				fetch(`/api/locked-problem/${contestId}/${teamId}`).catch(() => {
+					toast.error("Gagal refresh data soal terkunci");
+				});
+			}, 600000); // 10 Menit
+
+			return () => clearInterval(interval);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [contestId, teamId]);
 
 	const handleOnBack = async () => {
 		const reqBody = {

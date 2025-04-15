@@ -42,8 +42,6 @@ const FormLogin = () => {
 			setErrorMessage(data.error);
 			return;
 		}
-
-		router.push("/admin/batch");
 	};
 
 	return (
