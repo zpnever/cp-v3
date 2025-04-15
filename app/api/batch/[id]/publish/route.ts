@@ -69,7 +69,6 @@ export const POST = async (
 		});
 
 		await db.$transaction([
-			// Hapus Team yang tidak ada dalam daftar `newTeamIds`
 			db.batchTeam.deleteMany({
 				where: {
 					batchId: batchId,

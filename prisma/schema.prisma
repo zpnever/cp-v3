@@ -114,6 +114,8 @@ model Submission {
   batch               Batch               @relation(fields: [batchId], references: [id], onDelete: Cascade)
   Team                Team                @relation(fields: [teamId], references: [id], onDelete: Cascade)
   submissionProblems  SubmissionProblem[]
+
+  @@unique([batchId, teamId])
 }
 
 model SubmissionProblem {
