@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import LogStatus from "./LogStatus";
 import toast from "react-hot-toast";
-import { Problem, SubmissionProblem } from "@/lib/types";
+import { Language, Problem, SubmissionProblem } from "@/lib/types";
 import ProblemLayer from "./ProblemLayer";
 import {
 	Select,
@@ -20,13 +20,13 @@ import EditorLayer, { EditorLayerHandle } from "./EditorLayer";
 import CountdownTimer from "./ui/CountdownTimer";
 
 const languages = [
-	{ name: "javascript", id: "15" },
-	{ name: "python", id: "19" },
-	{ name: "ruby", id: "22" },
-	{ name: "cpp", id: "11" },
-	{ name: "c", id: "6" },
-	{ name: "java", id: "14" },
-	{ name: "rust", id: "23" },
+	{ name: "Javascript", id: "15" },
+	{ name: "Python", id: "19" },
+	{ name: "Ruby", id: "22" },
+	{ name: "C++", id: "11" },
+	{ name: "C", id: "6" },
+	{ name: "Java", id: "14" },
+	{ name: "Rust", id: "23" },
 ];
 
 interface IProps {
@@ -150,7 +150,24 @@ const ContestProblem = ({
 			.then((data) => setSubmissionProblem(data.data.submissionProblem));
 	}, [stepLogs, teamId, problemId]);
 
-	const handleReset = () => {};
+	const handleReset = async () => {
+		const res = await fetch(`/api/problem-contest/${teamId}/${problemId}`);
+		const json = await res.json();
+
+		if (!res.ok) {
+			toast.error("Error Reset");
+			return;
+		}
+
+		const getLanguage: Language = json.data.problem.languages.filter(
+			(lang: Language) => lang.languageId === parseInt(languageId)
+		);
+
+		setDraftCode((prev) => ({
+			...prev,
+			languageId: getLanguage.functionTemplate,
+		}));
+	};
 
 	const handleOnBack = async () => {
 		const reqBody = {

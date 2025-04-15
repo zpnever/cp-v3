@@ -48,7 +48,7 @@ const Contest = ({ userId, teamId, contestId }: IProps) => {
 		};
 
 		getContestData();
-	}, [teamId, contestId]);
+	}, [teamId, contestId, stepProblem]);
 
 	useEffect(() => {
 		const getLockedProblem = async () => {
@@ -89,7 +89,7 @@ const Contest = ({ userId, teamId, contestId }: IProps) => {
 					.catch(() => {
 						toast.error("Gagal refresh data soal terkunci");
 					});
-			}, 5000); // 5000ms = 5 detik
+			}, 10000); // 10 detik
 
 			return () => clearInterval(interval);
 		}
