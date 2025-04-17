@@ -31,7 +31,6 @@ const ShowTeam = () => {
 	const [stepCreateTeam, setStepCreateTeam] = useState(false);
 	const [sortField, setSortField] = useState<"name" | "status">("name");
 	const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-	const router = useRouter();
 
 	const fetchTeams = () => {
 		setIsLoading(true);

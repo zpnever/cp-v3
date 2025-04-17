@@ -11,6 +11,7 @@ import FormUpdateBatch from "@/components/batch-form/FormUpdateBatch";
 import Link from "next/link";
 import { duplicateBatch } from "@/actions/duplicateBatch";
 import AlertDeleteBatch from "./ui/Alert-Delete";
+import AlertSubmitBatch from "./ui/Alert-Submit";
 
 interface IBatch extends FormBatchType {
 	id: string;
@@ -188,6 +189,8 @@ const BatchManagement = () => {
 										<Copy size={15} className="mr-2" />
 										Duplicate
 									</Button>
+
+									<AlertSubmitBatch pending={pending} batchId={data.id} />
 
 									<AlertDeleteBatch
 										pending={pending}

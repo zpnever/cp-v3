@@ -2,9 +2,6 @@
 
 import { Editor } from "@monaco-editor/react";
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
-import { saveDraft } from "@/utils/saveDrafts";
-import { useRouter } from "next/navigation";
-import { Problem } from "@/lib/types";
 import toast from "react-hot-toast";
 
 export interface EditorLayerHandle {

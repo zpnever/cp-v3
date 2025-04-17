@@ -1,8 +1,7 @@
 "use client";
 
-import { Batch, Submission } from "@/lib/types";
+import { Submission } from "@/lib/types";
 import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { RefreshCw } from "lucide-react";
@@ -25,7 +24,7 @@ const CardBatchContest = ({ teamId }: { teamId: string }) => {
 				setSubmission(json.data.submissions);
 				setIsLoading(false);
 			} catch (error) {
-				console.log(error)
+				console.log(error);
 			}
 			setIsLoading(false);
 		};

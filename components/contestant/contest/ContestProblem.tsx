@@ -1,7 +1,7 @@
 "use client";
 
 import { useSubmissionStore } from "@/lib/zustand/logsStore";
-import { ArrowLeft, Divide, RefreshCw, RotateCcw } from "lucide-react";
+import { ArrowLeft, RefreshCw, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import LogStatus from "./LogStatus";

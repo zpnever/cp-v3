@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { redis } from "@/lib/redis";
+import { getScore } from "@/utils/scoring";
 
 export async function GET(req: Request) {
 	const { searchParams } = new URL(req.url);
@@ -30,16 +31,18 @@ export async function POST(req: Request) {
 
 	// submit
 	if (finished.length === totalMember) {
-		const submissionProblems = await db.submissionProblem.findMany({
-			where: {
-				teamId,
-				submissionId: contestId,
-			},
-		});
-
 		const submission = await db.submission.findFirst({
 			where: {
+				teamId,
 				id: contestId,
+			},
+			include: {
+				batch: {
+					include: {
+						problems: true,
+					},
+				},
+				submissionProblems: true,
 			},
 		});
 
@@ -52,16 +55,34 @@ export async function POST(req: Request) {
 
 		const startedAt = new Date(submission?.startAt);
 		const endedAt = new Date();
-
 		const diffMs = endedAt.getTime() - startedAt.getTime();
+		const completionTime = Math.floor(diffMs / 1000);
+		const memoryUsages = submission.submissionProblems.map(
+			(s) => s.memory ?? null
+		);
+		const executionTimes = submission.submissionProblems.map(
+			(s) => s.executionTime ?? null
+		);
+
+		const submissionResult = {
+			solvedCount: submission.submissionProblems.length,
+			totalProblems: submission.batch.problems.length,
+			memoryUsages,
+			executionTimes,
+			maxCompletionTime: submission.batch.timer * 60,
+			completionTime,
+		};
+
+		const score = getScore(submissionResult);
 
 		await db.submission.update({
 			where: { id: contestId },
 			data: {
 				isFinish: true,
-				totalProblemsSolved: submissionProblems.length,
-				completionTime: Math.floor(diffMs / 1000),
+				totalProblemsSolved: submission.submissionProblems.length,
+				completionTime,
 				submittedAt: new Date(),
+				score,
 			},
 		});
 	}
