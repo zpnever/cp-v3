@@ -12,6 +12,7 @@ const CardBatchContest = ({ teamId }: { teamId: string }) => {
 	const [submission, setSubmission] = useState<Submission[]>([]);
 	const [currentTime, setCurrentTime] = useState(new Date());
 	const [isLoading, setIsLoading] = useState(true);
+	const [isDisqualified, setIsDisqualified] = useState(false);
 	const router = useRouter();
 
 	useEffect(() => {
@@ -21,6 +22,7 @@ const CardBatchContest = ({ teamId }: { teamId: string }) => {
 				const json = await res.json();
 
 				setBatches(json.data.batches);
+				setIsDisqualified(json.data.isDisqualified);
 				setSubmission(json.data.submissions);
 				setIsLoading(false);
 			} catch (error) {
@@ -85,76 +87,91 @@ const CardBatchContest = ({ teamId }: { teamId: string }) => {
 
 	return (
 		<div className="space-y-6">
-			<div>
-				<h2 className="text-xl font-bold">Available Batches</h2>
+			{isDisqualified ? (
+				<div className="w-full h-24 space-y-2 flex items-center flex-col justify-center text-center font-semibold">
+					<div className="text-red-500">
+						Sayang sekali, jalanmu harus terhenti disini. Tapi jangan
+						menyerah—teruslah berlatih!
+					</div>
+					<div className="text-gray-600">
+						Terima kasih telah berpartisipasi dalam lomba ini
+					</div>
+				</div>
+			) : (
+				<div>
+					<h2 className="text-xl font-bold">Available Batches</h2>
 
-				{availableBatches.length > 0 ? (
-					<div className="grid grid-cols-1 pt-4 gap-4 md:grid-cols-2 lg:grid-cols-3">
-						{availableBatches.map((batchItem) => {
-							const { batch, isStart } = batchItem;
-							const canStart = isStartTimeReached(batch.startedAt) && !isStart;
+					{availableBatches.length > 0 ? (
+						<div className="grid grid-cols-1 pt-4 gap-4 md:grid-cols-2 lg:grid-cols-3">
+							{availableBatches.map((batchItem) => {
+								const { batch, isStart } = batchItem;
+								const canStart =
+									isStartTimeReached(batch.startedAt) && !isStart;
 
-							return (
-								<div
-									key={batch.id}
-									className="p-4 border rounded-lg shadow-sm bg-white"
-								>
-									<div className="flex justify-between items-start mb-2">
-										<h3 className="font-semibold text-lg">{batch.title}</h3>
-										{batch.publish && (
-											<span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
-												Published
-											</span>
-										)}
-									</div>
-
-									<p className="text-sm text-gray-600 mb-2">
-										{batch.description}
-									</p>
-
-									<div className="space-y-2 mb-4">
-										<div className="flex items-start gap-2">
-											<span className="text-gray-500 text-sm">Start Time:</span>
-											<span className="text-sm font-medium">
-												{formatToIndonesianTime(batch.startedAt)}
-											</span>
-										</div>
-
-										<div className="flex items-start gap-2">
-											<span className="text-gray-500 text-sm">Duration:</span>
-											<span className="text-sm font-medium">
-												{batch.timer} minutes
-											</span>
-										</div>
-									</div>
-
-									<button
-										onClick={() => handleStartBatch(batch.id)}
-										disabled={!canStart}
-										className={`w-full py-2 px-4 rounded-md transition-colors ${
-											isStart
-												? "bg-gray-300 text-gray-600 cursor-not-allowed"
-												: canStart
-												? "bg-blue-600 text-white hover:bg-blue-700"
-												: "bg-gray-300 text-gray-600 cursor-not-allowed"
-										}`}
+								return (
+									<div
+										key={batch.id}
+										className="p-4 border rounded-lg shadow-sm bg-white"
 									>
-										{isStart
-											? "Started"
-											: canStart
-											? "Start Batch"
-											: "Not Yet Available"}
-									</button>
-								</div>
-							);
-						})}
-					</div>
-				) : (
-					<div className="text-center py-8 text-gray-500">
-						No available batches.
-					</div>
-				)}
-			</div>
+										<div className="flex justify-between items-start mb-2">
+											<h3 className="font-semibold text-lg">{batch.title}</h3>
+											{batch.publish && (
+												<span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+													Published
+												</span>
+											)}
+										</div>
+
+										<p className="text-sm text-gray-600 mb-2">
+											{batch.description}
+										</p>
+
+										<div className="space-y-2 mb-4">
+											<div className="flex items-start gap-2">
+												<span className="text-gray-500 text-sm">
+													Start Time:
+												</span>
+												<span className="text-sm font-medium">
+													{formatToIndonesianTime(batch.startedAt)}
+												</span>
+											</div>
+
+											<div className="flex items-start gap-2">
+												<span className="text-gray-500 text-sm">Duration:</span>
+												<span className="text-sm font-medium">
+													{batch.timer} minutes
+												</span>
+											</div>
+										</div>
+
+										<button
+											onClick={() => handleStartBatch(batch.id)}
+											disabled={!canStart}
+											className={`w-full py-2 px-4 rounded-md transition-colors ${
+												isStart
+													? "bg-gray-300 text-gray-600 cursor-not-allowed"
+													: canStart
+													? "bg-blue-600 text-white hover:bg-blue-700"
+													: "bg-gray-300 text-gray-600 cursor-not-allowed"
+											}`}
+										>
+											{isStart
+												? "Started"
+												: canStart
+												? "Start Batch"
+												: "Not Yet Available"}
+										</button>
+									</div>
+								);
+							})}
+						</div>
+					) : (
+						<div className="text-center py-8 text-gray-500">
+							No available batches.
+						</div>
+					)}
+				</div>
+			)}
 
 			{/* History Section */}
 			<div>

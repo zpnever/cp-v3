@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp, Code, ArrowUpDown } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import toast from "react-hot-toast";
 import {
 	Table,
@@ -19,14 +19,16 @@ import {
 	SelectValue,
 } from "../ui/select";
 import { Button } from "../ui/button";
-import { Batch, SubmissionProblem, Team } from "@/lib/types";
+import { Batch, Submission, Team } from "@/lib/types";
+import { Checkbox } from "../ui/checkbox";
+import AlertDisqualified from "./ui/Alert-Disqualified";
 
-const Leaderboard = () => {
+const DisqualifiedTable = () => {
 	const [batches, setBatches] = useState<Batch[]>([]);
 	const [teams, setTeams] = useState([]);
 	const [selectedBatch, setSelectedBatch] = useState("");
 	const [submissions, setSubmissions] = useState<any>([]);
-	const [expandedTeam, setExpandedTeam] = useState<null | string>(null);
+	const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>([]);
 	const [sortConfig, setSortConfig] = useState({
 		key: "teamName",
 		direction: "ascending",
@@ -88,8 +90,6 @@ const Leaderboard = () => {
 				totalExecutionTime: totalExecutionTime.toFixed(3),
 				totalMemory,
 				completionTime: sub.completionTime,
-				submissionProblems: sub.submissionProblems || [],
-				isFinish: sub.isFinish,
 			};
 		});
 
@@ -103,6 +103,8 @@ const Leaderboard = () => {
 		if (selectedBatchData) {
 			processSubmissions(selectedBatchData, teams);
 		}
+		// Reset selected teams when changing batches
+		setSelectedTeamIds([]);
 	};
 
 	const requestSort = (key: string) => {
@@ -129,10 +131,6 @@ const Leaderboard = () => {
 		return sortableItems;
 	};
 
-	const toggleExpandRow = (teamId: string) => {
-		setExpandedTeam(expandedTeam === teamId ? null : teamId);
-	};
-
 	// Format completion time from seconds to human-readable format
 	const formatCompletionTime = (seconds: number) => {
 		if (!seconds) return "N/A";
@@ -149,6 +147,30 @@ const Leaderboard = () => {
 		return result.trim();
 	};
 
+	// Handle individual team selection
+	const handleTeamSelection = (teamId: string, checked: boolean) => {
+		if (checked) {
+			setSelectedTeamIds((prev) => [...prev, teamId]);
+		} else {
+			setSelectedTeamIds((prev) => prev.filter((id) => id !== teamId));
+		}
+	};
+
+	// Handle select all teams
+	const handleSelectAll = (checked: boolean) => {
+		if (checked) {
+			const allTeamIds = submissions.map(
+				(submission: Submission) => submission.teamId
+			);
+			setSelectedTeamIds(allTeamIds);
+		} else {
+			setSelectedTeamIds([]);
+		}
+	};
+
+	// Disqualify selected teams
+	const handleDisqualifyTeams = async () => {};
+
 	useEffect(() => {
 		getBatchesSubmissions();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -163,7 +185,7 @@ const Leaderboard = () => {
 
 	return (
 		<div className="space-y-4 container mx-auto px-4 py-6">
-			<h2 className="text-2xl font-bold">Leaderboard</h2>
+			<h2 className="text-2xl font-bold">Disqualified Team</h2>
 
 			{/* Batch Selection */}
 			<div className="flex items-center space-x-2">
@@ -250,101 +272,42 @@ const Leaderboard = () => {
 									<ArrowUpDown size={16} />
 								</Button>
 							</TableHead>
-							<TableHead>Status</TableHead>
+							<TableHead>
+								<Checkbox
+									checked={
+										submissions.length > 0 &&
+										selectedTeamIds.length === submissions.length
+									}
+									onCheckedChange={handleSelectAll}
+									aria-label="Select all teams"
+								/>
+							</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
 						{getSortedItems().map((submission, index) => (
-							<React.Fragment key={submission.id}>
-								<TableRow
-									className="cursor-pointer hover:bg-gray-50"
-									onClick={() => toggleExpandRow(submission.teamId)}
-								>
-									<TableCell>{index + 1}</TableCell>
-									<TableCell className="font-medium">
-										<div className="flex items-center">
-											{submission.teamName}
-											<Button variant="ghost" size="sm" className="ml-2">
-												{expandedTeam === submission.teamId ? (
-													<ChevronUp size={16} />
-												) : (
-													<ChevronDown size={16} />
-												)}
-											</Button>
-										</div>
-									</TableCell>
-									<TableCell>{submission.problemsSolved}</TableCell>
-									<TableCell>{submission.score}</TableCell>
-									<TableCell>{submission.totalExecutionTime}</TableCell>
-									<TableCell>{submission.totalMemory}</TableCell>
-									<TableCell>
-										{formatCompletionTime(submission.completionTime)}
-									</TableCell>
-									<TableCell>
-										<span
-											className={`px-2 py-1 rounded-full text-xs ${
-												submission.isFinish
-													? "bg-green-100 text-green-800"
-													: "bg-yellow-100 text-yellow-800"
-											}`}
-										>
-											{submission.isFinish ? "Completed" : "In Progress"}
-										</span>
-									</TableCell>
-								</TableRow>
-
-								{expandedTeam === submission.teamId && (
-									<TableRow className="bg-gray-50">
-										<TableCell colSpan={8} className="p-4">
-											<div className="space-y-4">
-												<h3 className="font-bold flex items-center gap-2">
-													<Code size={16} />
-													Submission Solutions
-												</h3>
-												{submission.submissionProblems &&
-												submission.submissionProblems.length > 0 ? (
-													<div className="space-y-4">
-														{submission.submissionProblems.map(
-															(problem: SubmissionProblem) => (
-																<div
-																	key={problem.id}
-																	className="border rounded-md p-3 bg-white"
-																>
-																	<div className="flex justify-between mb-2">
-																		<div className="font-medium">
-																			Problem ID: {problem.problemId}
-																		</div>
-																		<div className="flex space-x-4 text-sm">
-																			<span>
-																				Execution: {problem.executionTime}s
-																			</span>
-																			<span>Memory: {problem.memory}KB</span>
-																			<span
-																				className={`px-2 py-0.5 rounded-full ${
-																					problem.success
-																						? "bg-green-100 text-green-800"
-																						: "bg-red-100 text-red-800"
-																				}`}
-																			>
-																				{problem.success ? "Success" : "Failed"}
-																			</span>
-																		</div>
-																	</div>
-																	<pre className="bg-gray-900 text-gray-100 p-3 rounded-md overflow-x-auto">
-																		<code>{problem.code}</code>
-																	</pre>
-																</div>
-															)
-														)}
-													</div>
-												) : (
-													<p>No solutions submitted yet.</p>
-												)}
-											</div>
-										</TableCell>
-									</TableRow>
-								)}
-							</React.Fragment>
+							<TableRow key={submission.id} className="hover:bg-gray-50">
+								<TableCell>{index + 1}</TableCell>
+								<TableCell className="font-medium">
+									{submission.teamName}
+								</TableCell>
+								<TableCell>{submission.problemsSolved}</TableCell>
+								<TableCell>{submission.score}</TableCell>
+								<TableCell>{submission.totalExecutionTime}</TableCell>
+								<TableCell>{submission.totalMemory}</TableCell>
+								<TableCell>
+									{formatCompletionTime(submission.completionTime)}
+								</TableCell>
+								<TableCell className="">
+									<Checkbox
+										checked={selectedTeamIds.includes(submission.teamId)}
+										onCheckedChange={(checked) =>
+											handleTeamSelection(submission.teamId, checked === true)
+										}
+										aria-label={`Select ${submission.teamName}`}
+									/>
+								</TableCell>
+							</TableRow>
 						))}
 						{submissions.length === 0 && (
 							<TableRow>
@@ -356,8 +319,13 @@ const Leaderboard = () => {
 					</TableBody>
 				</Table>
 			</div>
+
+			{/* Disqualify Button */}
+			<div className="flex justify-end">
+				<AlertDisqualified teamIds={selectedTeamIds} />
+			</div>
 		</div>
 	);
 };
 
-export default Leaderboard;
+export default DisqualifiedTable;

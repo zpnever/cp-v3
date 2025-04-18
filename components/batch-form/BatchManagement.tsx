@@ -57,7 +57,6 @@ const BatchManagement = () => {
 	const handleDuplicate = (id: string) => {
 		startTransition(() => {
 			duplicateBatch(id);
-			router.refresh();
 		});
 	};
 

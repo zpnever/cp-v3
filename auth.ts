@@ -62,7 +62,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 	adapter: PrismaAdapter(db),
 	session: { strategy: "jwt" },
 	pages: {
-		signOut: "/login", // redirect tujuan setelah logout
+		signOut: "/", // redirect tujuan setelah logout
 	},
 	...authConfig,
 });
