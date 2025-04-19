@@ -101,7 +101,11 @@ const ContestProblem = ({
 
 	// LOGS
 	useEffect(() => {
-		const socket = io(process.env.SOCKET_URL || "http://103.87.66.7:3001");
+		const socket = io(process.env.SOCKET_URL || "wss://inacomp.site", {
+			path: "/ws",
+			transports: ["websocket"],
+		});
+
 		const roomId = `${userId}:${problemId}`;
 
 		// Debug events
@@ -326,7 +330,7 @@ const ContestProblem = ({
 									Logs
 								</div>
 								<div className="ml-4">
-									{submissionProblem?.success ? (
+									{submissionProblem?.success ?
 										<div>
 											<span>
 												Memory :{" "}
@@ -345,9 +349,7 @@ const ContestProblem = ({
 												S
 											</span>
 										</div>
-									) : (
-										<div></div>
-									)}
+									:	<div></div>}
 								</div>
 							</div>
 							<div>
