@@ -6,6 +6,9 @@ import { db } from "@/lib/db";
 import speakeasy from "speakeasy";
 import { createTransport } from "nodemailer";
 import { hashSync } from "bcrypt-ts";
+import { Resend } from "resend";
+import React from "react";
+import { ResendEmailOTP } from "@/components/email/send/ResendTemplateOtp";
 
 // VERIFY EMAIL
 export const verifyEmail = async (
@@ -37,7 +40,7 @@ export const verifyEmail = async (
 			data: { otp },
 		});
 
-		sendOTPEmail(email, otp);
+		sendOTPEmail(email, otp, "Sending OTP");
 
 		return null;
 	} catch (error) {
@@ -46,21 +49,33 @@ export const verifyEmail = async (
 	}
 };
 
-// SEND OTP TO EMAIL FUNCTION
-async function sendOTPEmail(email: string, otp: string) {
-	const transporter = createTransport({
-		service: "gmail",
-		auth: {
-			user: "competitiveprogramming06@gmail.com",
-			pass: "jrez fifb sicz vsxh",
-		},
-	});
+// // SEND OTP TO EMAIL FUNCTION
+// async function sendOTPEmail(email: string, otp: string) {
+// 	const transporter = createTransport({
+// 		service: "gmail",
+// 		auth: {
+// 			user: "competitiveprogramming06@gmail.com",
+// 			pass: "jrez fifb sicz vsxh",
+// 		},
+// 	});
 
-	await transporter.sendMail({
-		from: `competitiveprogramming06@gmail.com`,
-		to: email,
-		subject: "Kode OTP Verifikasi",
-		html: `<p>Kode OTP Anda: ${otp}</p>`,
+// 	await transporter.sendMail({
+// 		from: `competitiveprogramming06@gmail.com`,
+// 		to: email,
+// 		subject: "Kode OTP Verifikasi",
+// 		html: `<p>Kode OTP Anda: ${otp}</p>`,
+// 	});
+// }
+
+// SEND OTP TO EMAIL FUNCTION
+async function sendOTPEmail(email: string, otp: string, subject: string) {
+	const resend = new Resend(process.env.RESEND_API_KEY);
+
+	const response = await resend.emails.send({
+		from: "CP Inacomp <send@inacomp.site>",
+		to: [email],
+		subject: `${subject}`,
+		react: React.createElement(ResendEmailOTP, { otp }),
 	});
 }
 
@@ -129,7 +144,7 @@ export const resendOTP = async (email: string) => {
 			data: { otp },
 		});
 
-		sendOTPEmail(email, otp);
+		sendOTPEmail(email, otp, "Resend OTP");
 
 		return null;
 	} catch (error) {

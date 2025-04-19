@@ -1,6 +1,7 @@
 import ProfileIconDropdown from "@/components/auth/profile-icon-dropdown";
 import Link from "next/link";
 import { auth } from "@/auth";
+import Image from "next/image";
 
 const listNav = [{ name: "Batch", href: "/batch" }];
 
@@ -18,7 +19,14 @@ export default async function RootLayout({
 					<ul className="flex gap-4 items-center">
 						<li className="border-r-2 border-gray-200 pr-6 mr-2">
 							<Link href="/" className="text-xl font-bold ">
-								Logo
+								<Image src="/logo.png" alt="logo.png" width={24} height={24} />
+								<Image
+									src="/title.png"
+									alt="title.png"
+									width={80}
+									height={28}
+									className="h-8 w-full"
+								/>
 							</Link>
 						</li>
 						{listNav.map((l) => (

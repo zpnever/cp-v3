@@ -3,11 +3,12 @@
 import * as z from "zod";
 import { NewPasswordSchema, ResetPasswordSchema } from "@/lib/zod";
 import { getUserByEmail } from "./user";
-import { createTransport } from "nodemailer";
-// import { Resend } from "resend";
+import { Resend } from "resend";
 import { generatePasswordResetToken } from "@/lib/token";
 import { db } from "@/lib/db";
 import { hash } from "bcrypt-ts";
+import { ResendEmailReset } from "@/components/email/send/ResendTemplate";
+import React from "react";
 
 export const sendResetToken = async (
 	values: z.infer<typeof ResetPasswordSchema>
@@ -31,35 +32,35 @@ export const sendResetToken = async (
 	return { success: "Success sending link to your email" };
 };
 
-async function sendResetTokenEmail(email: string, token: string) {
-	const resetLink = `${process.env.NEXT_PUBLIC_API_URL}/new-password?token=${token}`;
-	const transporter = createTransport({
-		service: "gmail",
-		auth: {
-			user: "competitiveprogramming06@gmail.com",
-			pass: "jrez fifb sicz vsxh",
-		},
-	});
-
-	await transporter.sendMail({
-		from: `competitiveprogramming06@gmail.com`,
-		to: email,
-		subject: "Password Reset",
-		html: `<p>Click <a href="${resetLink}">here</a> to reset your password</br> <p>expires in 1 hour</p>`,
-	});
-}
-
 // async function sendResetTokenEmail(email: string, token: string) {
-// 	const resend = new Resend("re_123456789");
 // 	const resetLink = `${process.env.NEXT_PUBLIC_API_URL}/new-password?token=${token}`;
+// 	const transporter = createTransport({
+// 		service: "gmail",
+// 		auth: {
+// 			user: "competitiveprogramming06@gmail.com",
+// 			pass: "jrez fifb sicz vsxh",
+// 		},
+// 	});
 
-// 	await resend.emails.send({
-// 		from: "competitiveprogramming@gmail.com",
+// 	await transporter.sendMail({
+// 		from: `competitiveprogramming06@gmail.com`,
 // 		to: email,
 // 		subject: "Password Reset",
-// 		html: `<p>Click <a href="${resetLink}">here</a> to reset your password</p><p>Expires in 1 hour</p>`,
+// 		html: `<p>Click <a href="${resetLink}">here</a> to reset your password</br> <p>expires in 1 hour</p>`,
 // 	});
 // }
+
+async function sendResetTokenEmail(email: string, token: string) {
+	const resend = new Resend(process.env.RESEND_API_KEY);
+	const resetLink = `${process.env.NEXT_PUBLIC_API_URL}/new-password?token=${token}`;
+
+	await resend.emails.send({
+		from: "CP Inacomp <send@inacomp.site>",
+		to: [email],
+		subject: "Reset Password",
+		react: React.createElement(ResendEmailReset, { resetLink }),
+	});
+}
 
 export const newPassword = async (
 	values: z.infer<typeof NewPasswordSchema>,
